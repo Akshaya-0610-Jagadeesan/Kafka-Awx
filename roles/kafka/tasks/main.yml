@@ -24,3 +24,25 @@
     url: "https://downloads.apache.org/kafka/3.7.0/kafka_2.13-3.7.0.tgz"
     dest: "/tmp/kafka-3.7.0.tgz"
     mode: "0644"
+
+- name: Extract Kafka
+  ansible.builtin.unarchive:
+    src: "/tmp/kafka-3.7.0.tgz"
+    dest: "/opt"
+    remote_src: true
+    creates: "/opt/kafka_2.13-3.7.0"
+
+- name: Create Kafka symlink
+  ansible.builtin.file:
+    src: "/opt/kafka_2.13-3.7.0"
+    dest: /opt/kafka
+    state: link
+    force: true
+
+- name: Create Kafka data directory
+  ansible.builtin.file:
+    path: /var/lib/kafka
+    state: directory
+    owner: kafka
+    group: kafka
+    mode: "0755"
