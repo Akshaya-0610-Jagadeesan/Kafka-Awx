@@ -47,6 +47,23 @@
     group: kafka
     mode: "0644"
 
+- name: Generate KRaft cluster ID
+  ansible.builtin.command:
+    cmd: /opt/kafka/bin/kafka-storage.sh random-uuid
+  register: kafka_cluster_id
+  run_once: true
+  delegate_to: "{{ groups['kafka_nodes'][0] }}"
+  changed_when: false
+
+- name: Format Kafka storage
+  ansible.builtin.command:
+    cmd: >
+      /opt/kafka/bin/kafka-storage.sh format
+      -t {{ kafka_cluster_id.stdout }}
+      -c /opt/kafka/config/kraft/server.properties
+  args:
+    creates: /var/lib/kafka/meta.properties
+
 - name: Create Kafka systemd service
   ansible.builtin.copy:
     dest: /etc/systemd/system/kafka.service
@@ -78,3 +95,8 @@
   ansible.builtin.systemd:
     name: kafka
     enabled: true
+
+- name: Start Kafka
+  ansible.builtin.systemd:
+    name: kafka
+    state: started
