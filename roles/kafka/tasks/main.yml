@@ -11,9 +11,17 @@
     shell: /sbin/nologin
     create_home: false
 
+- name: Create Kafka installation directory
+  ansible.builtin.file:
+    path: /opt/kafka
+    state: directory
+    owner: kafka
+    group: kafka
+    mode: "0755"
+
 - name: Download Kafka
   ansible.builtin.get_url:
-    url: "https://downloads.apache.org/kafka/3.7.0/kafka_2.13-3.7.0.tgz"
+    url: "https://archive.apache.org/dist/kafka/3.7.0/kafka_2.13-3.7.0.tgz"
     dest: "/tmp/kafka-3.7.0.tgz"
     mode: "0644"
 
@@ -27,7 +35,7 @@
 - name: Create Kafka symlink
   ansible.builtin.file:
     src: "/opt/kafka_2.13-3.7.0"
-    dest: /opt/kafka
+    dest: "/opt/kafka"
     state: link
     force: true
 
