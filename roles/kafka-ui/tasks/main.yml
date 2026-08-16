@@ -1,0 +1,27 @@
+---
+- name: Install Podman
+  ansible.builtin.dnf:
+    name: podman
+    state: present
+
+- name: Pull Kafka UI image
+  ansible.builtin.command:
+    cmd: "podman pull {{ kafka_ui_image }}"
+  changed_when: false
+
+- name: Remove existing Kafka UI container
+  ansible.builtin.command:
+    cmd: podman rm -f kafka-ui
+  failed_when: false
+  changed_when: false
+
+- name: Start Kafka UI
+  ansible.builtin.command:
+    cmd: >
+      podman run -d
+      --name kafka-ui
+      --restart=always
+      -p {{ kafka_ui_port }}:8080
+      -e KAFKA_CLUSTERS_0_NAME=kafka-kraft
+      -e KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS={{ kafka_ui_bootstrap_servers | join(',') }}
+      {{ kafka_ui_image }}
