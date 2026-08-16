@@ -1,0 +1,7 @@
+---
+- name: Deploy Kafka KRaft Cluster
+  hosts: kafka_nodes
+  become: true
+
+  roles:
+    - kafka
