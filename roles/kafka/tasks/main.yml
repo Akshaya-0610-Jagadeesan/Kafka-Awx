@@ -11,14 +11,6 @@
     shell: /sbin/nologin
     create_home: false
 
-- name: Create Kafka installation directory
-  ansible.builtin.file:
-    path: /opt/kafka
-    state: directory
-    owner: kafka
-    group: kafka
-    mode: "0755"
-
 - name: Download Kafka
   ansible.builtin.get_url:
     url: "https://downloads.apache.org/kafka/3.7.0/kafka_2.13-3.7.0.tgz"
@@ -46,3 +38,43 @@
     owner: kafka
     group: kafka
     mode: "0755"
+
+- name: Create Kafka configuration
+  ansible.builtin.template:
+    src: server.properties.j2
+    dest: /opt/kafka/config/kraft/server.properties
+    owner: kafka
+    group: kafka
+    mode: "0644"
+
+- name: Create Kafka systemd service
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/kafka.service
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Apache Kafka
+      After=network-online.target
+      Wants=network-online.target
+
+      [Service]
+      Type=simple
+      User=kafka
+      Group=kafka
+      ExecStart=/opt/kafka/bin/kafka-server-start.sh /opt/kafka/config/kraft/server.properties
+      Restart=on-failure
+      RestartSec=5
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Enable Kafka
+  ansible.builtin.systemd:
+    name: kafka
+    enabled: true
