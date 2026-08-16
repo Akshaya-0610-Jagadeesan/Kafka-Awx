@@ -1,7 +1,8 @@
 ---
-- name: Deploy Kafka KRaft Cluster
+- name: Deploy Kafka Cluster
   hosts: kafka_nodes
   become: true
 
   roles:
     - kafka
+    - kafka-ui
