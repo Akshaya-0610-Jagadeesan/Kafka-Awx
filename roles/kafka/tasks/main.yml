@@ -1,0 +1,20 @@
+---
+- name: Install Java 17
+  ansible.builtin.dnf:
+    name: java-17-openjdk-headless
+    state: present
+
+- name: Create Kafka user
+  ansible.builtin.user:
+    name: kafka
+    system: true
+    shell: /sbin/nologin
+    create_home: false
+
+- name: Create Kafka installation directory
+  ansible.builtin.file:
+    path: /opt/kafka
+    state: directory
+    owner: kafka
+    group: kafka
+    mode: "0755"
