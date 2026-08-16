@@ -1,0 +1,7 @@
+---
+kafka_ui_port: 8080
+kafka_ui_image: "ghcr.io/kafbat/kafka-ui:latest"
+
+kafka_ui_bootstrap_servers:
+  - "172.31.44.196:9092"
+  - "172.31.1.69:9092"
